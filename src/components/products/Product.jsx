@@ -29,7 +29,6 @@ const Container = styled.div`
   flex-direction: column;
   cursor: pointer;
   padding: 0.5rem;
-
   transition: 100ms;
   position: relative;
   &.more {
@@ -57,7 +56,7 @@ const Container = styled.div`
   .fav {
     position: absolute;
     z-index: 100;
-    bottom: 40px;
+    bottom: 45px;
     right: 5px;
     visibility: hidden;
   }
@@ -130,6 +129,10 @@ const Product = ({
   const dispatch = useDispatch();
   const addToFavourite = async e => {
     e.stopPropagation();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     try {
       const newUser = await appwriteService.saveProduct(user?.email, $id);
       const { username, email, $id: userID, saved } = newUser;
@@ -148,8 +151,10 @@ const Product = ({
   };
 
   useEffect(() => {
-    const saved = user?.saved?.includes($id);
-    setSaved(saved);
+    if (user) {
+      const saved = user?.saved?.includes($id);
+      setSaved(saved);
+    }
   }, [$id, user]);
   return (
     <Container

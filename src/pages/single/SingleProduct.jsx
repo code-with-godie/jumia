@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { appwriteService } from '../../appWrite/appwriteService';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { IconButton, Rating } from '@mui/material';
 import FileViewer from '../../components/fileViewer/FileViewer';
@@ -217,6 +217,7 @@ const SingleProduct = () => {
   const [cartItem, setCartItem] = useState(null);
   const [inCart, setInCart] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const increaseAmount = () => {
     dispatch(increase(product?.$id));
   };
@@ -224,6 +225,10 @@ const SingleProduct = () => {
     dispatch(decrease(product?.$id));
   };
   const addProductToCart = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     dispatch(
       addToCart({
         $id: product?.$id,
@@ -241,6 +246,10 @@ const SingleProduct = () => {
   const user = useSelector(state => state.user.currentUser);
   const addToFavourite = async e => {
     e.stopPropagation();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     try {
       const newUser = await appwriteService.saveProduct(
         user?.email,
@@ -265,19 +274,23 @@ const SingleProduct = () => {
     }
   }, [params]);
   useEffect(() => {
-    appwriteService.addToRecentlyViewed(user.email, params?.productID);
+    user && appwriteService.addToRecentlyViewed(user?.email, params?.productID);
     getProduct();
   }, [user, params, getProduct]);
   useEffect(() => {
-    const item = cart?.cartItems?.find(item => item.$id === product?.$id);
-    if (item) {
-      setInCart(true);
-      setCartItem(item);
+    if (user) {
+      const item = cart?.cartItems?.find(item => item.$id === product?.$id);
+      if (item) {
+        setInCart(true);
+        setCartItem(item);
+      }
     }
-  }, [cart, product]);
+  }, [cart, product, user]);
   useEffect(() => {
-    const saved = user?.saved?.includes(params?.productID);
-    setSaved(saved);
+    if (user) {
+      const saved = user?.saved?.includes(params?.productID);
+      setSaved(saved);
+    }
   }, [params, user]);
   return (
     <Wrapper>
@@ -386,7 +399,7 @@ const SingleProduct = () => {
           </DescriptionContainer>
         </Left>
         <Right>
-          <DescriptionIformation />
+          <DescriptionIformation {...product} />
         </Right>
       </Container>
       <Container>

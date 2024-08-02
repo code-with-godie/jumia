@@ -35,108 +35,60 @@ const Label = styled.p`
   font-weight: 200;
   text-transform: capitalize;
 `;
-const BannerLinks = ({ setShowOverlay }) => {
-  const showOverlay = () => {
-    setShowOverlay(true);
-  };
-  const hideOverlay = () => {
-    setShowOverlay(false);
-  };
+const BannerLinks = () => {
+  // const showOverlay = () => {
+  //   setShowOverlay(true);
+  // };
+  // const hideOverlay = () => {
+  //   setShowOverlay(false);
+  // };
   return (
     <Container>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>supermarket</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>health and beauty</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>home and office</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>appliances</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>phone and tablet</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>computing</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>Tv and audio</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>Fashion</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>gaming</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>baby products</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>sporting products</Label>
       </Link>
-      <Link
-        className='link'
-        onMouseEnter={showOverlay}
-        onMouseLeave={hideOverlay}
-      >
+      <Link className='link'>
         <CiApple className='icon' />
         <Label>other categories</Label>
       </Link>

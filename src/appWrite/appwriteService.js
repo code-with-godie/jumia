@@ -201,7 +201,6 @@ class AppWriteService {
     let index = 0;
 
     while (index < saved.length - 1) {
-      console.log(saved);
       const product = await this.#_database.listDocuments(
         appwriteConfig.appWriteDatabase,
         appwriteConfig.appWriteProductCollectionID,
@@ -210,11 +209,9 @@ class AppWriteService {
           // Query.select(['category', '$id', 'images']),
         ]
       );
-      console.log(product);
       products.push(product.documents[0]);
       index++;
     }
-    console.log(products);
     return products;
     // return products.reverse().slice(0, 11);
   }
@@ -254,7 +251,7 @@ class AppWriteService {
     const userID = user?.$id;
     const viewed = user?.viewed;
     if (!viewed.includes(id)) {
-      console.log('performing viewed operation');
+      // console.log('performing viewed operation');
       user = await this.#_database.updateDocument(
         appwriteConfig.appWriteDatabase,
         appwriteConfig.appWriteUsersCollectionID,
@@ -262,19 +259,44 @@ class AppWriteService {
         { viewed: [id, ...viewed] }
       );
     } else {
-      console.log('already viewed. no operation performed');
+      // console.log('already viewed. no operation performed');
     }
     return user.documents;
   }
+  async getUserByID(userID) {
+    try {
+      const user = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteUsersCollectionID,
+        [Query.equal('$id', userID)]
+      );
+      return user.documents[0];
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async getUserByEmail(email) {
+    try {
+      const user = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteUsersCollectionID,
+        [Query.equal('email', email)]
+      );
+      return user.documents[0];
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async saveProduct(email, productID) {
     try {
       let user = await this.getUserByEmail(email);
       let saved = [...user?.saved];
       if (saved?.includes(productID)) {
-        console.log('product already saved,removing the item');
+        // console.log('product already saved,removing the item');
         saved = saved.filter(item => item !== productID);
       } else {
-        console.log('saving the products');
+        // console.log('saving the products');
         saved.unshift(productID);
       }
       const newUser = await this.#_database.updateDocument(
@@ -290,31 +312,6 @@ class AppWriteService {
       throw new Error(error);
     }
   }
-  async getUserByEmail(email) {
-    try {
-      let user = await this.#_database.listDocuments(
-        appwriteConfig.appWriteDatabase,
-        appwriteConfig.appWriteUsersCollectionID,
-        [Query.equal('email', email), Query.limit(1)]
-      );
-      return user.documents[0];
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-  async getUserByUseID(id) {
-    try {
-      let user = await this.#_database.getDocument(
-        appwriteConfig.appWriteDatabase,
-        appwriteConfig.appWriteUsersCollectionID,
-        id
-      );
-      return user;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-  //messenging functionality
   async sendMessage(messege) {
     try {
       let newMessege = await this.#_database.createDocument(
@@ -323,27 +320,64 @@ class AppWriteService {
         ID.unique(),
         messege
       );
-      return newMessege;
+      const { last_messege } = await this.#_database.updateDocument(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteRoomsCollectionID,
+        messege?.roomID,
+        { last_messege: messege?.body }
+      );
+      return { newMessege, last_messege };
     } catch (error) {
       throw new Error(error);
     }
   }
-  async getUserRooms(email) {
+  async getRoomMesseges(roomID) {
     try {
-      const user = await this.getUserByEmail(email);
+      let messeges = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteMessegesCollectionID,
+        [Query.equal('roomID', roomID)]
+      );
+      return messeges.documents;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async getUserRooms(userID) {
+    try {
       let rooms = await this.#_database.listDocuments(
         appwriteConfig.appWriteDatabase,
-        appwriteConfig.appWriteRoomsCollectionID
+        appwriteConfig.appWriteRoomsCollectionID,
+        [Query.contains('members', userID)]
       );
-      rooms = rooms.documents;
-      const usersRooms = rooms.filter(item => {
-        if (item?.members?.includes(user?.$id)) {
-          return item;
-        } else {
-          return false;
-        }
-      });
-      return usersRooms;
+      return rooms.documents;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async createRoom(members) {
+    try {
+      let room = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteRoomsCollectionID,
+        [
+          Query.contains('members', members[0]),
+          Query.contains('members', members[1]),
+        ]
+      );
+      if (room.total === 0) {
+        room = await this.#_database.createDocument(
+          appwriteConfig.appWriteDatabase,
+          appwriteConfig.appWriteRoomsCollectionID,
+          ID.unique(),
+          { members }
+        );
+        console.log('created a new room');
+        return room;
+      } else {
+        console.log('room alreday exists');
+        return room.documents[0];
+      }
     } catch (error) {
       throw new Error(error);
     }

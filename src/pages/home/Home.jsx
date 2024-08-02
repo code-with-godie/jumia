@@ -68,7 +68,7 @@ const Home = () => {
         </>
       ) : (
         <>
-          {user && <RecentlyViewed noTitleBg />}
+          {<RecentlyViewed noTitleBg />}
           <Recommended />
           {categories.map((item, index) => (
             <ProductList

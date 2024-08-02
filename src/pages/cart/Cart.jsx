@@ -17,12 +17,12 @@ const Container = styled.div`
 const Wrapper = styled.div`
   margin-top: 0.5rem;
   width: 100%;
-  max-width: 1150px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 1rem;
   @media screen and (min-width: 768px) {
+    max-width: 1150px;
+    align-items: flex-start;
     flex-direction: row;
   }
 `;

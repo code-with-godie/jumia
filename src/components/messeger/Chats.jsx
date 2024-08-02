@@ -1,9 +1,10 @@
 import { Close, Send } from '@mui/icons-material';
 import { Avatar, IconButton } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { appwriteService } from '../../appWrite/appwriteService';
 import { useSelector } from 'react-redux';
+import MesssegeSkeleton from '../skeleton/MesssegeSkeleton';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -72,23 +73,37 @@ const Button = styled.button`
     visibility: hidden;
   }
 `;
-const Chats = ({ setConversation, conversation }) => {
+const Chats = ({ setConversation, conversation, chats, setChats }) => {
   const [disabled, setDisabled] = useState(true);
-  const incomingChats = [...conversation?.messeges];
-  const [chats, setChats] = useState(incomingChats);
   const { currentUser: user } = useSelector(state => state.user);
   const [text, setText] = useState('');
+  const [loading, setLoading] = useState('');
+  const [error, setError] = useState('');
+  const getMesseges = useCallback(async () => {
+    try {
+      setLoading(true);
+      const sms = await appwriteService.getRoomMesseges(conversation?.roomID);
+      setChats(sms);
+    } catch (error) {
+      console.log(error);
+      setError(error?.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [conversation, setChats]);
   const sendMessege = async () => {
     try {
       const msg = {
         body: text,
         senderID: user?.$id,
         receiverID: conversation?.receiverID,
-        room: conversation?.roomID,
         roomID: conversation?.roomID,
       };
-      const res = await appwriteService.sendMessage(msg);
-      setChats(prev => [...prev, res]);
+      const { newMessege, last_messege } = await appwriteService.sendMessage(
+        msg
+      );
+      setChats(prev => [...prev, newMessege]);
+      conversation?.setDisplayMessage(last_messege);
       setText('');
     } catch (error) {
       console.log(error);
@@ -105,6 +120,9 @@ const Chats = ({ setConversation, conversation }) => {
       setDisabled(true);
     }
   }, [text]);
+  useEffect(() => {
+    getMesseges();
+  }, [getMesseges]);
   return (
     <Container>
       <Header>
@@ -121,15 +139,21 @@ const Chats = ({ setConversation, conversation }) => {
       </Header>
       {chats.length > 0 ? (
         <ChatsContainer>
-          {chats.map(item => (
-            <Messege
-              className={item?.senderID === user?.$id && 'mine'}
-              key={item?.$id}
-            >
-              {' '}
-              {item?.body}{' '}
-            </Messege>
-          ))}
+          {loading ? (
+            <MesssegeSkeleton />
+          ) : error ? (
+            <p> {error?.message} </p>
+          ) : (
+            chats.map(item => (
+              <Messege
+                className={item?.senderID === user?.$id && 'mine'}
+                key={item?.$id}
+              >
+                {' '}
+                {item?.body}{' '}
+              </Messege>
+            ))
+          )}
         </ChatsContainer>
       ) : (
         <ChatsContainer>

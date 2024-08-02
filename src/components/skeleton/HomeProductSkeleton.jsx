@@ -3,11 +3,12 @@ import image from '../../assets/loading.png';
 import styled from 'styled-components';
 const Container = styled.div`
   display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
   gap: 0.5rem;
-  height: 150px;
-  width: 100% !important;
+  height: 100%;
+  flex: 3;
   overflow: auto;
-  align-self: stretch;
   ::-webkit-scrollbar {
     height: 0;
   }
@@ -16,19 +17,18 @@ const Container = styled.div`
   }
 `;
 const ImageContainer = styled.div`
-  flex: 0 0 150px;
   display: grid;
-  place-content: center;
   background-color: #d4d4d6;
-  @media screen and (min-width: 768px) {
-    flex: 0 0 200px;
-  }
+  place-content: center;
+  width: 150px;
+  height: 200px;
+  animation: animate ease-in-out 300ms alternate-reverse;
 `;
 const Image = styled.img``;
 const HomeProductSkeleton = () => {
   return (
     <Container>
-      {Array(10).fill(
+      {Array(20).fill(
         <ImageContainer>
           {' '}
           <Image src={image} />{' '}

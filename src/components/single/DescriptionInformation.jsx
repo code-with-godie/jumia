@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import seller from '../../assets/sellerIfo.png';
 import desc from '../../assets/sellerDesc.png';
 import chat from '../../assets/chat.png';
+import { useSelector } from 'react-redux';
+import { appwriteService } from '../../appWrite/appwriteService';
+import { useNavigate } from 'react-router-dom';
 const Container = styled.div``;
 const ItemWrapper = styled.div`
   border-bottom: 1px solid #f6f6f6;
@@ -31,7 +34,21 @@ const Image = styled.img`
   height: auto;
   object-fit: contain;
 `;
-const DescriptionInformation = () => {
+const DescriptionInformation = ({ user: postUser, brand }) => {
+  const { currentUser: user } = useSelector(state => state.user);
+  const navigate = useNavigate();
+  const createRoom = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    try {
+      await appwriteService.createRoom([user?.$id, postUser?.$id]);
+      navigate('/account/inbox');
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Container>
       <ItemWrapper>
@@ -41,7 +58,7 @@ const DescriptionInformation = () => {
       </ItemWrapper>
       <ItemWrapper>
         <Item>
-          <Company>waazilishi</Company>
+          <Company> {brand} </Company>
         </Item>
         <Item>
           <Title>
@@ -56,13 +73,15 @@ const DescriptionInformation = () => {
           </Title>
         </Item>
       </ItemWrapper>
-      <ItemWrapper>
-        <Item>
-          <Title>
-            <Image src={chat} />
-          </Title>
-        </Item>
-      </ItemWrapper>
+      {user?.$id !== postUser?.$id && (
+        <ItemWrapper>
+          <Item onClick={createRoom}>
+            <Title>
+              <Image src={chat} />
+            </Title>
+          </Item>
+        </ItemWrapper>
+      )}
     </Container>
   );
 };

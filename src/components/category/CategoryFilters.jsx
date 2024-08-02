@@ -1,5 +1,5 @@
 import { FormControl, Radio, RadioGroup } from '@mui/material';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -7,6 +7,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { useSearchParams } from 'react-router-dom';
 import { appwriteService } from '../../appWrite/appwriteService';
 import { useSelector } from 'react-redux';
+import FiltersSkeleton from '../skeleton/FiltersSkeleton';
 
 const Container = styled.div`
   flex: 1;
@@ -54,6 +55,9 @@ const CategoryFilters = () => {
     let value = e.target.value;
     setQuery(prev => ({ ...prev, percent: value }));
   };
+  const filterProducts = useCallback(() => {
+    setSearchParams(query);
+  }, []);
   const handleBrand = async e => {
     let value = e.target.name;
     value = query?.brands?.includes(value)
@@ -61,10 +65,6 @@ const CategoryFilters = () => {
       : [...query.brands, value];
 
     setQuery(prev => ({ ...prev, brands: value }));
-    const products = await appwriteService.getFilteredProducts({
-      categories: value,
-    });
-    console.log(products);
   };
   const handlePrice = e => {
     let value = e.target.value;
@@ -83,9 +83,9 @@ const CategoryFilters = () => {
     getFilters();
   }, [searchParams]);
   useEffect(() => {
-    console.log(query);
-  }, [query]);
-  if (loading) return <p>loading </p>;
+    // filterProducts();
+  }, [query, filterProducts]);
+  if (loading) return <FiltersSkeleton />;
   return (
     <Container>
       <Item>
@@ -96,7 +96,7 @@ const CategoryFilters = () => {
               key={index}
               control={
                 <Checkbox
-                  checked={query.categories.includes(item)}
+                  checked={query?.categories?.includes(item)}
                   name={item}
                   onChange={handleCategory}
                 />
@@ -128,7 +128,7 @@ const CategoryFilters = () => {
                   <Checkbox
                     name={item}
                     onChange={handleBrand}
-                    checked={query.brands.includes(item)}
+                    checked={query?.brands?.includes(item)}
                   />
                 }
                 label={item}

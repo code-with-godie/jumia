@@ -13,10 +13,15 @@ const Container = styled.div`
   cursor: pointer;
 `;
 const UserName = styled.h4``;
-const Messege = styled.p``;
-const Room = ({ setConversation, members, last_messege, $id, messeges }) => {
+const Messege = styled.p`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+const Room = ({ setConversation, members, last_messege, $id }) => {
   const { currentUser: user } = useSelector(state => state.user);
   const [room, setRoom] = useState(null);
+  const [displayMessage, setDisplayMessage] = useState(last_messege);
   const otherUserID = members?.find(item => item !== user?.$id);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -24,14 +29,14 @@ const Room = ({ setConversation, members, last_messege, $id, messeges }) => {
     async otherUserID => {
       try {
         setLoading(true);
-        const data = await appwriteService.getUserByUseID(otherUserID);
-        console.log(data);
+        const data = await appwriteService.getUserByID(otherUserID);
         setRoom({
           username: data?.username,
           $id: data?.$id,
           avatar: user?.avatar,
         });
       } catch (error) {
+        console.log(error);
         setError(error?.message);
       } finally {
         setLoading(false);
@@ -42,7 +47,7 @@ const Room = ({ setConversation, members, last_messege, $id, messeges }) => {
 
   useEffect(() => {
     getRooms(otherUserID);
-  }, [getRooms]);
+  }, [getRooms, otherUserID]);
   if (loading)
     return (
       <Container>
@@ -64,8 +69,8 @@ const Room = ({ setConversation, members, last_messege, $id, messeges }) => {
         setConversation({
           ...room,
           roomID: $id,
-          messeges,
           receiverID: otherUserID,
+          setDisplayMessage,
         })
       }
     >
@@ -74,7 +79,7 @@ const Room = ({ setConversation, members, last_messege, $id, messeges }) => {
         alt={room?.username}
       />
       <UserName> {room?.username} </UserName>
-      {last_messege && <Messege> {last_messege} </Messege>}
+      {displayMessage && <Messege> {displayMessage} </Messege>}
     </Container>
   );
 };

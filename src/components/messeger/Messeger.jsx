@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import styled from 'styled-components';
 import Rooms from './Rooms';
 import Chats from './Chats';
@@ -28,8 +27,13 @@ const NoConversation = styled.div`
     display: block;
   }
 `;
-const Messeger = ({ rooms }) => {
-  const [conversation, setConversation] = useState(false);
+const Messeger = ({
+  rooms,
+  conversation,
+  setConversation,
+  chats,
+  setChats,
+}) => {
   return (
     <Container>
       <Left className={conversation && 'show'}>
@@ -42,6 +46,8 @@ const Messeger = ({ rooms }) => {
         <Right>
           <Chats
             conversation={conversation}
+            chats={chats}
+            setChats={setChats}
             setConversation={setConversation}
           />
         </Right>

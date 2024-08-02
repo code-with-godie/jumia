@@ -21,8 +21,9 @@ const RecentlyViewed = ({ noTitleBg }) => {
     }
   }, [user]);
   useEffect(() => {
-    getRecent();
-  }, [getRecent]);
+    user && getRecent();
+  }, [getRecent, user]);
+  if (!user) return;
   return (
     <>
       {recent.length > 0 && (

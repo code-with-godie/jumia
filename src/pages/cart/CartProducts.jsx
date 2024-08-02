@@ -5,6 +5,7 @@ import CartItem from './CartItem';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  /* justify-content: center; */
   gap: 0.5rem;
   flex: 1;
 `;

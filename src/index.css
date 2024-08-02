@@ -30,3 +30,11 @@ body {
 .scroll::-webkit-scrollbar {
   height: 5px;
 }
+@keyframes animate {
+  from {
+    opacity: 0.5rem;
+  }
+  to {
+    opacity: 1rem;
+  }
+}

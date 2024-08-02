@@ -26,29 +26,26 @@ const ImageContainer = styled.div`
   place-content: center;
   gap: 0.5rem;
 `;
-const Image = styled.img``;
-const ShopNow = styled.button`
-  padding: 1rem;
-  color: black;
-  background-color: transparent;
-  border: none;
-  font-size: 0.9rem;
-  border-radius: 0.2rem;
-  outline: none;
-  cursor: pointer;
+const Empty = styled.div`
+  display: grid;
+  flex: 1;
+  place-content: center;
+  gap: 0.5rem;
 `;
 const Messeger = () => {
   const [rooms, setRooms] = useState([]);
   const { currentUser: user } = useSelector(state => state.user);
+  const [conversation, setConversation] = useState(false);
+  const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const getRooms = useCallback(async () => {
     try {
       setLoading(true);
-      const rooms = await appwriteService.getUserRooms(user?.email);
-      console.log(rooms);
+      const rooms = await appwriteService.getUserRooms(user?.$id);
       setRooms(rooms);
     } catch (error) {
+      console.log(error);
       setError(error?.message);
     } finally {
       setLoading(false);
@@ -59,7 +56,7 @@ const Messeger = () => {
     getRooms();
   }, [getRooms]);
 
-  const realTime = () => {
+  const realTime = useCallback(() => {
     try {
       return appwriteService.client.subscribe(
         `databases.${appwriteConfig.appWriteDatabase}.collections.${appwriteConfig.appWriteMessegesCollectionID}.documents`,
@@ -69,20 +66,28 @@ const Messeger = () => {
               'databases.*.collections.*.documents.*.create'
             )
           ) {
-            console.log('a new messege arrived');
+            const { payload } = response;
+            //handle other user chats
+            if (
+              payload?.roomID === conversation?.roomID &&
+              payload.receiverID === user?.$id
+            ) {
+              setChats(prev => [...prev, payload]);
+              conversation?.setDisplayMessage(payload?.body);
+            }
           }
         }
       );
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [user, conversation]);
   useEffect(() => {
     const unsubscribe = realTime();
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [realTime]);
   if (loading)
     return (
       <Container>
@@ -101,8 +106,10 @@ const Messeger = () => {
     return (
       <Container>
         <ImageContainer>
-          <Image src={source} />
-          <ShopNow>you messeges will appear here</ShopNow>
+          <Empty>
+            <Title>you have not conversation yet</Title>
+            <Title className='small'>your chats will be shown here</Title>
+          </Empty>
         </ImageContainer>
       </Container>
     );
@@ -110,7 +117,13 @@ const Messeger = () => {
   return (
     <Container>
       <Title>Inbox</Title>
-      <MessegerApp rooms={rooms} />
+      <MessegerApp
+        conversation={conversation}
+        setConversation={setConversation}
+        rooms={rooms}
+        chats={chats}
+        setChats={setChats}
+      />
     </Container>
   );
 };
