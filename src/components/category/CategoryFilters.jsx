@@ -34,30 +34,38 @@ const ItemWrapper = styled.div``;
 const CategoryFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(null);
-  const [query, setQuery] = useState({ categories: [], brands: [] });
+  const [category, setCategory] = useState('');
+  const [query, setQuery] = useState({
+    tags: [],
+    brands: [],
+  });
   const [loading, setLoading] = useState();
   const { currentUser: user } = useSelector(state => state.user);
-  const getFilters = async () => {
+  const getFilters = useCallback(async () => {
     try {
       setLoading(true);
-      const filters = await appwriteService.getFilters(
-        searchParams.get('category'),
-        user?.email
-      );
+      const filters = await appwriteService.getFilters(category, user?.email);
       setFilters(filters);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
-  };
-  const handlePercentage = e => {
-    let value = e.target.value;
-    setQuery(prev => ({ ...prev, percent: value }));
-  };
+  }, [category, user]);
   const filterProducts = useCallback(() => {
-    setSearchParams(query);
-  }, []);
+    const brands = query.brands.join('&');
+    const tags = query.tags.join('&');
+    let tempQuery = {
+      category: searchParams.get('category'),
+    };
+    if (brands) {
+      tempQuery = { ...tempQuery, brands };
+    }
+    if (tags) {
+      tempQuery = { ...tempQuery, tags };
+    }
+    setSearchParams({ ...tempQuery });
+  }, [query, setSearchParams, searchParams]);
   const handleBrand = async e => {
     let value = e.target.name;
     value = query?.brands?.includes(value)
@@ -66,25 +74,33 @@ const CategoryFilters = () => {
 
     setQuery(prev => ({ ...prev, brands: value }));
   };
-  const handlePrice = e => {
-    let value = e.target.value;
-    setQuery(prev => ({ ...prev, price: value }));
-  };
   const handleCategory = e => {
     let value = e.target.name;
-    value = query?.categories?.includes(value)
-      ? query.categories.filter(item => item !== value)
-      : [...query.categories, value];
+    value = query?.tags?.includes(value)
+      ? query.tags.filter(item => item !== value)
+      : [...query.tags, value];
 
-    setQuery(prev => ({ ...prev, categories: value }));
+    setQuery(prev => ({ ...prev, tags: value }));
   };
 
   useEffect(() => {
-    getFilters();
+    category && getFilters();
+  }, [category, getFilters]);
+  useEffect(() => {
+    //for initial render when providing the filters
+    setCategory(searchParams.get('category'));
+    const brands = searchParams.get('brands');
+    const tags = searchParams.get('tags');
+    if (brands) {
+      setQuery(prev => ({ ...prev, brands: brands?.split('&') }));
+    }
+    if (tags) {
+      setQuery(prev => ({ ...prev, tags: tags?.split('&') }));
+    }
   }, [searchParams]);
   useEffect(() => {
-    // filterProducts();
-  }, [query, filterProducts]);
+    filterProducts();
+  }, [filterProducts]);
   if (loading) return <FiltersSkeleton />;
   return (
     <Container>
@@ -96,7 +112,7 @@ const CategoryFilters = () => {
               key={index}
               control={
                 <Checkbox
-                  checked={query?.categories?.includes(item)}
+                  checked={query?.tags?.includes(item)}
                   name={item}
                   onChange={handleCategory}
                 />

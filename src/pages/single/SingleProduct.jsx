@@ -238,6 +238,7 @@ const SingleProduct = () => {
         stock: product?.stock,
         size: null,
         images: product?.images,
+        description: product?.description,
       })
     );
   };
@@ -319,7 +320,13 @@ const SingleProduct = () => {
               <Row>
                 <LabelContainer>
                   <Label>brand :</Label>
-                  <Brand>
+                  <Brand
+                    onClick={() =>
+                      navigate(`/search?search=${product?.brand}`, {
+                        state: { brand: true },
+                      })
+                    }
+                  >
                     {product?.brand} | similar products from {product?.brand}{' '}
                   </Brand>
                 </LabelContainer>

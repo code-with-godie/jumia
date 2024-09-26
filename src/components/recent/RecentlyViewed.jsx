@@ -6,7 +6,6 @@ import { appwriteService } from '../../appWrite/appwriteService';
 const Wrapper = styled.div`
   margin-top: 0.5rem;
   width: 100%;
-  max-width: 1200px;
   background-color: ${props => props.theme.bg_white};
 `;
 const RecentlyViewed = ({ noTitleBg }) => {
@@ -21,7 +20,7 @@ const RecentlyViewed = ({ noTitleBg }) => {
     }
   }, [user]);
   useEffect(() => {
-    user && getRecent();
+    user?.email && getRecent();
   }, [getRecent, user]);
   if (!user) return;
   return (

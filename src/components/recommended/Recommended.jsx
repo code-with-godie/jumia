@@ -4,7 +4,6 @@ import ProductList from '../products/ProductList';
 const Wrapper = styled.div`
   margin-top: 0.5rem;
   width: 100%;
-  max-width: 1200px;
   background-color: ${props => props.theme.bg_white};
 `;
 const Recommended = ({ noTitleBg }) => {

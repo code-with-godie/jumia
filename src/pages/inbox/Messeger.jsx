@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import MessegerApp from '../../components/messeger/Messeger';
-import source from '../../assets/emptyOrdes.png';
 import { appwriteService } from '../../appWrite/appwriteService';
 import { useSelector } from 'react-redux';
-import LoadingAnimation from '../../components/loading/LoadingAnimation';
 import { appwriteConfig } from '../../appWrite/appConfig';
+import SmsRoomsSkelton from '../../components/skeleton/SmsRoomsSkeleton';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -92,7 +91,7 @@ const Messeger = () => {
     return (
       <Container>
         {' '}
-        <LoadingAnimation />{' '}
+        <SmsRoomsSkelton />
       </Container>
     );
   if (loading)

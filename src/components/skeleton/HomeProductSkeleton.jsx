@@ -14,6 +14,9 @@ const Container = styled.div`
   }
   @media screen and (min-width: 768px) {
     height: 200px;
+    &.fill {
+      height: auto !important;
+    }
   }
 `;
 const ImageContainer = styled.div`
@@ -25,10 +28,10 @@ const ImageContainer = styled.div`
   animation: animate ease-in-out 300ms alternate-reverse;
 `;
 const Image = styled.img``;
-const HomeProductSkeleton = () => {
+const HomeProductSkeleton = ({ counter = 20, fill }) => {
   return (
-    <Container>
-      {Array(20).fill(
+    <Container className={fill && 'fill'}>
+      {Array(counter).fill(
         <ImageContainer>
           {' '}
           <Image src={image} />{' '}

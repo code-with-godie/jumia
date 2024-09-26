@@ -6,14 +6,12 @@ import { Link } from 'react-router-dom';
 import HomeProductSkeleton from '../skeleton/HomeProductSkeleton';
 import { appwriteService } from '../../appWrite/appwriteService';
 import { useSelector } from 'react-redux';
+import icon from '../../assets/flash.png';
 
 const Wrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  @media screen and (min-width: 768px) {
-    max-width: 1200px;
-  }
 `;
 
 const HeaderContainer = styled.div`
@@ -33,6 +31,10 @@ const HeaderContainer = styled.div`
       text-decoration: underline;
     }
   }
+`;
+const Image = styled.img`
+  object-fit: contain;
+  max-height: 30px;
 `;
 const ProductContainer = styled.div`
   display: flex;
@@ -57,6 +59,7 @@ const ProductList = ({
   noTitleBg,
   showless,
   title,
+  flash,
   single,
   category,
   showScroll,
@@ -66,8 +69,8 @@ const ProductList = ({
   const user = useSelector(state => state.user.currentUser);
   const getProducts = useCallback(async () => {
     try {
-      const products = await appwriteService.getCategoryProducts(
-        category,
+      const products = await appwriteService.filterProducts(
+        { category },
         user?.email
       );
       setProducts(products);
@@ -82,7 +85,10 @@ const ProductList = ({
   return (
     <Wrapper>
       <HeaderContainer bg={noTitleBg}>
-        <Title>{title || 'default title'}</Title>
+        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+          {flash && <Image src={icon} />}
+          <Title>{title || 'default title'}</Title>
+        </div>
         {!showless && (
           <Link className='link'>
             see all

@@ -17,7 +17,7 @@ const Wrapper = styled.main`
 const Container = styled.section`
   overflow: auto;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1500px;
 `;
 const Layout = () => {
   const blackList = ['/account', '/cart'];

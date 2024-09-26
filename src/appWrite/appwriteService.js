@@ -10,6 +10,76 @@ class AppWriteService {
       .setProject(appwriteConfig.appWriteProject);
     this.#_database = new Databases(this.client);
   }
+  async search(searchTerm, brand) {
+    try {
+      const titles = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteProductCollectionID,
+        [Query.search('title', searchTerm)]
+      );
+
+      const brand = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteProductCollectionID,
+        [Query.search('brand', searchTerm)]
+      );
+      const category = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteProductCollectionID,
+        [Query.search('category', searchTerm)]
+      );
+      const tags = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteProductCollectionID,
+        [Query.search('tags', searchTerm)]
+      );
+      console.log('tags', tags);
+
+      const products = [];
+      tags.documents?.forEach(item => {
+        if (!products.some(product => product.$id === item.$id)) {
+          products.push(item);
+        }
+      });
+
+      titles.documents?.forEach(item => {
+        if (!products.some(product => product?.$id === item.$id)) {
+          products.push(item);
+        }
+      });
+      brand.documents?.forEach(item => {
+        if (!products.some(product => product.$id === item.$id)) {
+          products.push(item);
+        }
+      });
+      category.documents?.forEach(item => {
+        if (!products.some(product => product.$id === item.$id)) {
+          products.push(item);
+        }
+      });
+
+      if (brand) {
+        return brand.documents;
+      }
+      return products;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async flashSales() {
+    try {
+      const products = await this.#_database.listDocuments(
+        appwriteConfig.appWriteDatabase,
+        appwriteConfig.appWriteProductCollectionID,
+        [Query.equal('flash', true)]
+      );
+      console.log('flash', products);
+
+      return products.documents;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
   async getCategories() {
     const titles = [];
     const products = await this.#_database.listDocuments(
@@ -30,6 +100,7 @@ class AppWriteService {
       return titles;
     }
   }
+
   async getFilteredProducts(filters) {
     let query = [];
     try {
@@ -75,7 +146,7 @@ class AppWriteService {
           // console.log('top-picks', products);
           return await this.helpGenerateFilters(products);
         default:
-          products = await this.getProductsByCategory(category);
+          products = await this.getProductsByCategory({ category });
           // console.log('category', products);
           return await this.helpGenerateFilters(products);
       }
@@ -118,17 +189,18 @@ class AppWriteService {
       throw new Error(error);
     }
   }
-
-  async getCategoryProducts(category, email) {
+  async filterProducts({ category, brands, tags }, email) {
     switch (category) {
       case 'recent':
         return await this.getRecentProducts(email);
+      case 'flash':
+        return await this.flashSales();
       case 'recommended':
-        return await this.getRecommendedProducts();
+        return await this.getRecommendedProducts({ tags, brands });
       case 'top-picks':
-        return await this.getTopPicksProducts();
+        return await this.getTopPicksProducts({ tags, brands });
       default:
-        return await this.getProductsByCategory(category);
+        return await this.getProductsByCategory({ category, brands, tags });
     }
   }
   async getRecommendedProducts() {
@@ -155,39 +227,46 @@ class AppWriteService {
       throw new Error(error);
     }
   }
-  async getProductsByCategory(category) {
+  async getProductsByCategory({ category, tags, brands }) {
     try {
-      const products = await this.#_database.listDocuments(
+      const data = await this.#_database.listDocuments(
         appwriteConfig.appWriteDatabase,
         appwriteConfig.appWriteProductCollectionID,
         [Query.equal('category', category)]
       );
-      return products?.documents;
+      if (tags) {
+        console.log('tags present');
+      }
+      if (brands) {
+        console.log('brands present');
+      }
+
+      return data?.documents;
     } catch (error) {
       throw new Error(error);
     }
   }
   async getRecentProducts(email) {
     let products = [];
+    if (!email) throw new Error('please provide email address');
     const user = await this.getUserByEmail(email);
     const viewed = [...user?.viewed];
+
     if (viewed.length === 0) {
       return [];
     }
     let index = 0;
 
     while (index < viewed.length - 1) {
-      const product = await this.#_database.listDocuments(
+      const product = await this.#_database.getDocument(
         appwriteConfig.appWriteDatabase,
         appwriteConfig.appWriteProductCollectionID,
-        [
-          Query.equal('$id', viewed[index]),
-          // Query.select(['category', '$id', 'images']),
-        ]
+        viewed[index]
       );
-      products.push(product.documents[0]);
+      products.push(product);
       index++;
     }
+
     return products;
     // return products.reverse().slice(0, 11);
   }
@@ -249,7 +328,7 @@ class AppWriteService {
   async addToRecentlyViewed(email, id) {
     let user = await this.getUserByEmail(email);
     const userID = user?.$id;
-    const viewed = user?.viewed;
+    let viewed = [...user?.viewed];
     if (!viewed.includes(id)) {
       // console.log('performing viewed operation');
       user = await this.#_database.updateDocument(
@@ -259,8 +338,11 @@ class AppWriteService {
         { viewed: [id, ...viewed] }
       );
     } else {
-      // console.log('already viewed. no operation performed');
+      // viewed = viewed.filter(item => item !== id);
+      // viewed = [id, ...viewed];
+      // console.log('already viewed. no operation performed,sorting insteaded');
     }
+
     return user.documents;
   }
   async getUserByID(userID) {
@@ -291,6 +373,9 @@ class AppWriteService {
   async saveProduct(email, productID) {
     try {
       let user = await this.getUserByEmail(email);
+      if (!user) {
+        return null;
+      }
       let saved = [...user?.saved];
       if (saved?.includes(productID)) {
         // console.log('product already saved,removing the item');

@@ -10,6 +10,7 @@ import { appwriteService } from '../../appWrite/appwriteService';
 import RecentlyViewed from '../../components/recent/RecentlyViewed';
 import Recommended from '../../components/recommended/Recommended';
 import { useSelector } from 'react-redux';
+import FlashSales from '../../components/flash/FlashSales';
 const Container = styled.section`
   flex: 1;
   background-color: ${props => props.theme.bg_primary_2};
@@ -70,6 +71,7 @@ const Home = () => {
         <>
           {<RecentlyViewed noTitleBg />}
           <Recommended />
+          <FlashSales />
           {categories.map((item, index) => (
             <ProductList
               key={index}

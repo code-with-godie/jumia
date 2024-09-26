@@ -9,9 +9,10 @@ import { Badge, IconButton } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { BsPersonFillCheck } from 'react-icons/bs';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import AccountModel from './AccountModel';
 import { openDrawer, toggleAccountModel } from '../../context/appSlice';
+import { useState } from 'react';
 const Wrapper = styled.nav`
   background-color: ${props => props.theme.bg_white};
 
@@ -99,7 +100,7 @@ const Control = styled.div`
 const ControlLabel = styled.p`
   font-size: 1rem;
   color: ${props => props.theme.text_black};
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 900px) {
     display: none;
   }
 `;
@@ -134,6 +135,7 @@ const SearchButton = styled.button`
   font-size: 1rem;
   box-shadow: 0 0 5px 2px #cfcfcf;
   border-radius: 0.2rem;
+  cursor: pointer;
   @media screen and (max-width: 768px) {
     display: none;
   }
@@ -155,7 +157,17 @@ const Topnav = () => {
   const user = useSelector(state => state.user.currentUser);
   const { amount } = useSelector(state => state.cart);
   const dispatch = useDispatch();
+  const params = useSearchParams();
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
+  const handleSearch = () => {
+    if (!search) return;
+    navigate(`/search?search=${search}`);
+  };
+
+  // useEffect(() => {
+  //   setSearch(params[0].get('search'));
+  // }, [params]);
   return (
     <Wrapper>
       <Container>
@@ -178,9 +190,13 @@ const Topnav = () => {
             <IconButton>
               <Search />
             </IconButton>
-            <SearchInput placeholder='search products, brand and categories' />
+            <SearchInput
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder='search products, brand and categories'
+            />
           </SearchWrapper>
-          <SearchButton>search</SearchButton>
+          <SearchButton onClick={handleSearch}>search</SearchButton>
         </SearchContainer>
         <ControlsContainer>
           <Control onClick={() => dispatch(toggleAccountModel())}>

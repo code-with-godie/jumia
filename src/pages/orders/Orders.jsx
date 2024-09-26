@@ -35,7 +35,7 @@ const ShopNow = styled.button`
   cursor: pointer;
 `;
 const Orders = () => {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState([1, 2, 3, 4, 5]);
   const navigate = useNavigate();
 
   if (orders.length === 0) {

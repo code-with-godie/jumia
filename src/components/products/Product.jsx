@@ -110,6 +110,17 @@ const Discount = styled.p`
   right: 0.2rem;
   z-index: 10;
 `;
+const DiscountWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+const Label = styled.p`
+  text-transform: capitalize;
+  color: ${props => props.theme.btn_primary};
+  background-color: #f68a1e4f;
+  padding: 0.2rem 0.5rem;
+`;
 const Product = ({
   sellingPrice,
   discount,
@@ -181,7 +192,14 @@ const Product = ({
         <Price>
           <Important>Ksh.</Important> {sellingPrice - discount}
         </Price>
-        {discount !== 0 && <OldPrice>Ksh.{sellingPrice}</OldPrice>}
+        {discount !== 0 && (
+          <DiscountWrapper>
+            <OldPrice>Ksh.{sellingPrice}</OldPrice>
+            <Label className='discount'>
+              {`-${parseFloat((discount / sellingPrice) * 100).toFixed(2)}%`}
+            </Label>
+          </DiscountWrapper>
+        )}
       </DescriptionContainer>
       <MoreDescription className={!fixed && 'more'}>
         <Rating

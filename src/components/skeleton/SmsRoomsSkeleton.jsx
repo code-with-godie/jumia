@@ -3,28 +3,32 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
-  flex: 1;
-  max-width: 300px;
-  position: sticky;
-  background-color: white;
-  top: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  height: 100%;
   overflow: auto;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  .dark {
+    background: #2a2929;
+  }
+  .desc {
+    background-color: ${props => props.dark && '#626262'};
+    height: 200px;
+    width: 100%;
+  }
 `;
-const FiltersSkeleton = () => {
+const SmsRoomsSkelton = () => {
   return (
     <Container>
       {Array(10).fill(
         <Skeleton
           variant='rectangular'
-          height={50}
-          width='100%'
+          className='desc'
         />
       )}
     </Container>
   );
 };
 
-export default FiltersSkeleton;
+export default SmsRoomsSkelton;

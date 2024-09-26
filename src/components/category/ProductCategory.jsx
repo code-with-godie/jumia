@@ -10,9 +10,6 @@ const Wrapper = styled.div`
   background-color: white;
   display: flex;
   align-items: center;
-  @media screen and (min-width: 768px) {
-    max-width: 1200px;
-  }
 `;
 const Container = styled.div`
   flex: 1;

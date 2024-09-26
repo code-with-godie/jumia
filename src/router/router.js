@@ -13,6 +13,8 @@ import SavedPrdouct from '../pages/saved/SavedPrdouct';
 import Recent from '../pages/recent/Recent';
 import Orders from '../pages/orders/Orders';
 import Cart from '../pages/cart/Cart';
+import Search from '../pages/search/Search';
+import SuccesPage from '../pages/success/Success';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -20,6 +22,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <Home /> },
       { path: '/category', element: <Category /> },
+      { path: '/search', element: <Search /> },
       { path: '/category/:category/:productID', element: <SingleProduct /> },
     ],
   },
@@ -31,6 +34,10 @@ export const router = createBrowserRouter([
         path: '/',
         element: <Layout />,
         children: [{ path: '/cart', element: <Cart /> }],
+      },
+      {
+        path: '/checkout-success',
+        element: <SuccesPage />,
       },
       {
         path: '',
@@ -46,6 +53,10 @@ export const router = createBrowserRouter([
               { path: '/account/recently-viewed', element: <Recent /> },
               { path: '/account/orders', element: <Orders /> },
             ],
+          },
+          {
+            path: '/orders',
+            element: <Orders />,
           },
         ],
       },

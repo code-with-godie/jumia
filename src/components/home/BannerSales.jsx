@@ -1,8 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import BannerOverlay from './BannerOverlay';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, A11y } from 'swiper';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import slide1 from '../../assets/slide1.gif';
@@ -25,7 +23,7 @@ const Container = styled.div`
   display: flex;
   .swiper {
     width: 100%;
-    max-width: 800px;
+    /* max-width: 800px; */
     height: 100%;
     position: relative;
   }
@@ -41,6 +39,8 @@ const BannerSales = ({ showOverlay }) => {
       <Carousel
         infiniteLoop
         autoPlay
+        showThumbs={false}
+        className='swiper'
       >
         <BannerSlide url={slide1} />
         <BannerSlide url={slide2} />

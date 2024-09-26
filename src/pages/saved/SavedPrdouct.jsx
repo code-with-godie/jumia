@@ -40,15 +40,16 @@ const ShopNow = styled.button`
 `;
 
 const Wrapper = styled.div`
-  height: 100%;
   flex: 3;
   display: grid;
-  overflow: auto;
+
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   align-content: flex-start;
   gap: 0.5rem;
   @media screen and (min-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    overflow: auto;
+    height: 100%;
   }
 `;
 const SavedPrdouct = () => {
